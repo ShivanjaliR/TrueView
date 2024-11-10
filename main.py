@@ -17,7 +17,24 @@ from fastapi import FastAPI
 import uvicorn
 from models.video import VideoResult
 from resources.constants import Extract_Comments_Path
+from fastapi.middleware.cors import CORSMiddleware
+import random
 
+app = FastAPI()
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:8000",
+    "https://www.youtube.com",
+    "http://localhost:36114"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 load_dotenv()
 
 api_key = os.getenv("API_KEY")
@@ -171,9 +188,47 @@ def get_title(video_id):
     title = response["items"][0]["snippet"]["title"] if response["items"] else "Video not found"
     return title
 
-app = FastAPI()
+def get_no_negative_comments(comments):
+    negative_comments = []
+    for comment in list(comments):
+        sentence = re.sub(r'[^a-zA-Z0-9\s]', '', comment)
+        score = sentiment_scale_analysis(sentence).split(":")
+        if len(score) > 2:
+            if score[1].isdigit():
+                if int(score[1]) < 5:
+                    negative_comments.append(comment)
+        else:
+            if score[0].isdigit():
+                if int(score[0]) < 5:
+                    negative_comments.append(comment)
+    print(negative_comments)
+    return len(negative_comments)
 
-@app.post("/result/{video_id}")
+@app.get("/result_test/{video_id}")
+def get_result_test_json(video_id: str):
+    # this is a test playholder for frontend scaffolding, do not use this for production
+    '''data = {
+        "summary": summary,
+        "view_count": view_count,
+        "likes": likes,
+        "dislikes": dislikes,
+        "sentiment_score": sentiment_score
+    }
+    json_data = json.dumps(data, indent=4)'''
+
+    video = VideoResult()
+    video.video_id = video_id
+    video.title = "Will the languages of the past stay relevant ? Lets find out in this video"
+    video.summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    video.view_count = random.randint(1, 10000)
+    video.no_of_likes = random.randint(1, 1000)
+    video.no_of_dislikes = random.randint(1, 100)
+    video.no_negative_comments = random.randint(1, 100)
+    video.sentiment_score = random.randint(1, 10)
+    return video
+
+
+@app.get("/result/{video_id}")
 def get_result_json(video_id: str):
     # You have to extract the video id from the YouTube url
     # video_id = "q_Q4o0sMBBA"  # (Scale: 10) FULL SPEECH: Trump projected winner of 2024 presidential election : https://www.YouTube.com/watch?v=q_Q4o0sMBBA
@@ -194,9 +249,13 @@ def get_result_json(video_id: str):
         df = pd.read_csv(file_name)
 
     # Considering only top 500 commnets for analysis.
-    top_1000_rows = df.head(500)
+    CTX = 10
+    top_1000_rows = df.head(CTX)
+    SUM_CTX = 50
+    top_50_rows = df.head(SUM_CTX)
     # Merge all user comments
     merged_comments = merge_comments(top_1000_rows['comment'])
+    merged_comments_summary = merge_comments(top_50_rows['comment'])
 
     '''Split merged user comments and create Documents for each chunk as input suppose 
         to have page_content attribute in specific format to get summary of input text.
@@ -204,8 +263,19 @@ def get_result_json(video_id: str):
     text_splitter = CharacterTextSplitter()
     texts = text_splitter.split_text(merged_comments)
     docs = [Document(page_content=t) for t in texts]
+    print("docs = ") 
+    print(docs)
     summary = get_summary(docs)
     print("Successfully summarize user comments.")
+
+    text_splitter = CharacterTextSplitter()
+    texts_summary = text_splitter.split_text(merged_comments_summary)
+    docs_summary = [Document(page_content=t) for t in texts_summary]
+    print("docs summary = ") 
+    print(docs_summary)
+    summary = get_summary(docs_summary)
+    print("Successfully summarize user comments.")
+
 
     # Get title of give YouTube video
     title = get_title(video_id)
@@ -219,6 +289,10 @@ def get_result_json(video_id: str):
     sentiment_score = sentiment_scale_analysis(texts)
     print("Successfully calculate YouTube video's sentiment score.")
 
+    no_negative_comments = get_no_negative_comments(top_1000_rows["comment"])
+    print("Successfully found no of negative comments for YouTube video.")
+
+
     # Create json object of all result.
     '''data = {
         "summary": summary,
@@ -229,6 +303,9 @@ def get_result_json(video_id: str):
     }
     json_data = json.dumps(data, indent=4)'''
 
+    ctv_ratio = 0.4
+    dislikes = int(int(int(no_negative_comments)//CTX)*view_count*int(ctv_ratio))
+
     video = VideoResult()
     video.video_id = video_id
     video.title = title
@@ -237,8 +314,10 @@ def get_result_json(video_id: str):
     video.no_of_likes = likes
     video.no_of_dislikes = dislikes
     video.sentiment_score = sentiment_score
+    video.no_negative_comments = no_negative_comments
     return video
 
 if __name__ == '__main__':
-    uvicorn.run(app, port=36114, host='127.0.0.1')
+    #uvicorn.run(app, port=36114, host='127.0.0.1')
+    uvicorn.run(app)
 

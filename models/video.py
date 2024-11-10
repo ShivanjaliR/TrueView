@@ -6,3 +6,4 @@ class VideoResult():
     no_of_likes: int
     no_of_dislikes: int
     sentiment_score: int
+    no_negative_comments: int

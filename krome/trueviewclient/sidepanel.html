@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrueView Client</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+</head>
+
+<body>
+
+  <section class="section">
+
+    <div class="box">
+      <article class="media">
+        <div class="media-left">
+          <figure class="image is-64x64">
+            <img src="images/TrueView.png" alt="Image" />
+          </figure>
+        </div>
+        <div class="media-content">
+          <div class="content">
+            <p>
+              <strong>TrueVue</strong>
+              <!--<h1>TrueView</h1>-->
+            </p>
+              Know what's actually happening in the conversations...
+          </div>
+
+        </div>
+      </article>
+    </div>
+    <div class="box is-hidden" id="progress-bar-global">
+      <article class="media">
+        <progress class="progress is-large is-success" max="100">
+        </progress>
+      </article>
+    </div>
+    <div class="box" id="analysis">
+      <article class="media">
+        <div class="content">
+          <h4>Analysis</h4>
+          <br />
+          <section>
+            <strong>Title: </strong>
+            <div id="jsonresponse-title"></div>
+
+            <strong>Views: </strong>
+            <div id="jsonresponse-viewcount"></div>
+
+            <br />
+            <strong><span class="icon"><i class="fa-solid fa-thumbs-up"></i></span> Likes: </strong>
+            <div id="jsonresponse-likes"></div>
+            <div>
+              <progress class="progress is-large is-success" id="inferredlikesbar">
+              </progress>
+            </div>
+            <br />
+            <strong><span class="icon"><i class="fa-solid fa-thumbs-down"></i></span> Inferred Dislikes: </strong>
+            <div id="jsonresponse-dislikes"></div>
+            <div>
+              <!--<progress class="progress is-large" value="30" max="100" id="inferreddislikesbar">-->
+              <progress class="progress is-large is-danger" id="inferreddislikesbar">
+              </progress>
+            </div>
+
+            <br />
+            <strong>Summary: </strong>
+            <div id="jsonresponse-summary"></div>
+            <br />
+
+            <strong>TrueVue Score: </strong>
+            <div id="jsonresponse-sentiment"></div>
+            <div>
+              <progress class="progress is-large is-info" max="10" id="sentimentbar">
+              </progress>
+            </div>
+
+            <!--<button id="generator-button">Generate</button>-->
+
+          </section>
+
+        </div>
+
+    </div>
+    </article>
+    </div>
+
+    <!-- <div class="container">
+      <h1 class="title">
+        TrueView
+      </h1>
+      <p class="subtitle">
+        Know what's actually happening with <strong>TrueView</strong>!
+      </p>
+    </div>-->
+  </section>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+  <div id="jsonresponse"></div>
+</body>
+
+<script src="sidepanel.js"></script>
+
+</html>
