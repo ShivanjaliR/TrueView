@@ -12,4 +12,4 @@
 
 # Swagger Fast API Output
 
-![TrueView_Swagger.png](..%2F..%2FOneDrive%2FDesktop%2FTrueView_Swagger.png)
+![Swagger Fast API](./output/TrueView_Swagger.png)
