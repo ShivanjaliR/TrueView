@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "TrueView",
+  "version": "1.0",
+  "description": "Derive the true nature of public's sentiment",
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_title": "Click to open TrueView panel"
+  },
+  "permissions": [
+    "sidePanel",
+    "tabs",
+    "scripting",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/watch*"
+      ],
+      "css": [
+        "sidepanel.css"
+      ],
+      "js": [
+        "content-script.js"
+      ]
+    }
+  ],
+  "host_permissions": [
+    "http://localhost:36114/",
+    "http://localhost:8000/"
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+B",
+        "mac": "Command+B"
+      }
+    }
+  },
+  "icons": {
+    "16": "images/TrueView.png",
+    "48": "images/TrueView.png",
+    "128": "images/TrueView.png"
+  }
+}
