@@ -48,7 +48,10 @@ TrueView empowers viewers with actionable insights, helping them make informed v
 
 ## Features
 
- 
+## True View Score:
+1 = Extremely abusive, harmful, discriminatory, or threatening comments.
+5 = Neutral or mildly critical comments, offering constructive criticism or general feedback.
+10 = Highly positive, supportive, encouraging, or kind comments.
 
 - **Real-Time Comment Analysis**
 
