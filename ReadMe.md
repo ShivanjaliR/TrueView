@@ -19,7 +19,9 @@
 ![Swagger Fast API](./output/result_1.png)
 ![Swagger Fast API](./output/result_2.png)
 
-# TrueView - YouTube Sentiment Analysis Extension
+# True View: Bringing attention to true viewer opinions
+
+No dislike count? No problem! Get the true vibe of any YouTube video instantly through 'True View' browser extension!
 
 ## Inspiration
 
