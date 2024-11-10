@@ -1,3 +1,6 @@
+# True View: Bringing attention to true viewer opinions
+
+No dislike count? No problem! Get the true vibe of any YouTube video instantly through 'True View' browser extension!
 
 # Prerequisites
 1. pip install virtualenv
@@ -10,18 +13,6 @@
 1. Directly run python main.py file.
 2. Open link: http://127.0.0.1:36114/docs in browser
 
-# Swagger Fast API Output
-
-![Swagger Fast API](./output/TrueView_Swagger.png)
-
-# Results
-
-![Swagger Fast API](./output/result_1.png)
-![Swagger Fast API](./output/result_2.png)
-
-# True View: Bringing attention to true viewer opinions
-
-No dislike count? No problem! Get the true vibe of any YouTube video instantly through 'True View' browser extension!
 
 ## Inspiration
 
@@ -163,10 +154,16 @@ TrueView is evolving, with exciting features planned for even deeper insights:
 
 With these enhancements, TrueView aims to become the go-to tool for YouTube insights, providing a more granular understanding of video content and audience reactions. Stay tuned for updates!
 
- 
-
 ---
 
- 
 
 TrueView browser extension offers a richer, more informative YouTube experience, empowering users to make data-driven viewing decisions and helping creators understand audience feedback more effectively.
+
+# Swagger Fast API Output
+
+![Swagger Fast API](./output/TrueView_Swagger.png)
+
+# Results
+
+![Swagger Fast API](./output/result_1.png)
+![Swagger Fast API](./output/result_2.png)
