@@ -171,6 +171,22 @@ def get_title(video_id):
     title = response["items"][0]["snippet"]["title"] if response["items"] else "Video not found"
     return title
 
+def get_no_negative_comments(comments):
+    negative_comments = []
+    for comment in list(comments):
+        sentence = re.sub(r'[^a-zA-Z0-9\s]', '', comment)
+        score = sentiment_scale_analysis(sentence).split(":")
+        if len(score) > 2:
+            if score[1].isdigit():
+                if int(score[1]) < 5:
+                    negative_comments.append(comment)
+        else:
+            if score[0].isdigit():
+                if int(score[0]) < 5:
+                    negative_comments.append(comment)
+    print(negative_comments)
+    return len(negative_comments)
+
 app = FastAPI()
 
 @app.post("/result/{video_id}")
@@ -219,6 +235,9 @@ def get_result_json(video_id: str):
     sentiment_score = sentiment_scale_analysis(texts)
     print("Successfully calculate YouTube video's sentiment score.")
 
+    no_negative_comments = get_no_negative_comments(top_1000_rows["comment"])
+    print("Successfully found no of negative comments for YouTube video.")
+
     # Create json object of all result.
     '''data = {
         "summary": summary,
@@ -237,6 +256,7 @@ def get_result_json(video_id: str):
     video.no_of_likes = likes
     video.no_of_dislikes = dislikes
     video.sentiment_score = sentiment_score
+    video.no_negative_comments = no_negative_comments
     return video
 
 if __name__ == '__main__':
