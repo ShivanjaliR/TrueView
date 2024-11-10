@@ -188,6 +188,21 @@ def get_title(video_id):
     title = response["items"][0]["snippet"]["title"] if response["items"] else "Video not found"
     return title
 
+def get_no_negative_comments(comments):
+    negative_comments = []
+    for comment in list(comments):
+        sentence = re.sub(r'[^a-zA-Z0-9\s]', '', comment)
+        score = sentiment_scale_analysis(sentence).split(":")
+        if len(score) > 2:
+            if score[1].isdigit():
+                if int(score[1]) < 5:
+                    negative_comments.append(comment)
+        else:
+            if score[0].isdigit():
+                if int(score[0]) < 5:
+                    negative_comments.append(comment)
+    print(negative_comments)
+    return len(negative_comments)
 
 @app.get("/result_test/{video_id}")
 def get_result_test_json(video_id: str):
@@ -208,6 +223,7 @@ def get_result_test_json(video_id: str):
     video.view_count = random.randint(1, 10000)
     video.no_of_likes = random.randint(1, 1000)
     video.no_of_dislikes = random.randint(1, 100)
+    video.no_negative_comments = random.randint(1, 100)
     video.sentiment_score = random.randint(1, 10)
     return video
 
@@ -233,9 +249,13 @@ def get_result_json(video_id: str):
         df = pd.read_csv(file_name)
 
     # Considering only top 500 commnets for analysis.
-    top_1000_rows = df.head(50)
+    CTX = 10
+    top_1000_rows = df.head(CTX)
+    SUM_CTX = 50
+    top_50_rows = df.head(SUM_CTX)
     # Merge all user comments
     merged_comments = merge_comments(top_1000_rows['comment'])
+    merged_comments_summary = merge_comments(top_50_rows['comment'])
 
     '''Split merged user comments and create Documents for each chunk as input suppose 
         to have page_content attribute in specific format to get summary of input text.
@@ -243,8 +263,19 @@ def get_result_json(video_id: str):
     text_splitter = CharacterTextSplitter()
     texts = text_splitter.split_text(merged_comments)
     docs = [Document(page_content=t) for t in texts]
+    print("docs = ") 
+    print(docs)
     summary = get_summary(docs)
     print("Successfully summarize user comments.")
+
+    text_splitter = CharacterTextSplitter()
+    texts_summary = text_splitter.split_text(merged_comments_summary)
+    docs_summary = [Document(page_content=t) for t in texts_summary]
+    print("docs summary = ") 
+    print(docs_summary)
+    summary = get_summary(docs_summary)
+    print("Successfully summarize user comments.")
+
 
     # Get title of give YouTube video
     title = get_title(video_id)
@@ -258,6 +289,10 @@ def get_result_json(video_id: str):
     sentiment_score = sentiment_scale_analysis(texts)
     print("Successfully calculate YouTube video's sentiment score.")
 
+    no_negative_comments = get_no_negative_comments(top_1000_rows["comment"])
+    print("Successfully found no of negative comments for YouTube video.")
+
+
     # Create json object of all result.
     '''data = {
         "summary": summary,
@@ -268,6 +303,9 @@ def get_result_json(video_id: str):
     }
     json_data = json.dumps(data, indent=4)'''
 
+    ctv_ratio = 0.4
+    dislikes = int(int(int(no_negative_comments)//CTX)*view_count*int(ctv_ratio))
+
     video = VideoResult()
     video.video_id = video_id
     video.title = title
@@ -276,6 +314,7 @@ def get_result_json(video_id: str):
     video.no_of_likes = likes
     video.no_of_dislikes = dislikes
     video.sentiment_score = sentiment_score
+    video.no_negative_comments = no_negative_comments
     return video
 
 if __name__ == '__main__':
